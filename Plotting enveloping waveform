@@ -1,0 +1,98 @@
+import numpy as np
+import librosa
+import librosa.display
+import matplotlib as plt
+
+#import the sounds C3, C4 and C5 guitar sounds
+
+cfour = "GuitarSoundsC3C4C5/ClassicGuitarC3.wav"
+cfour = "GuitarSoundsC3C4C5/ClassicGuitarC4.wav"
+cfive = "GuitarSoundsC3C4C5/ClassicGuitarC5.wav"
+
+# load to librosa and sample at 44100 hz
+
+cthree, sr = librosa.load(cthree, sr=44100)
+cfour, _ = librosa.load(cfour, sr=44100)
+cfive, _ = librosa.load(cfive, sr=44100)
+
+#plot the waveform of the signals.
+
+plt.Figure(figsize=(50,100))
+
+plt.subplot(3,1,1)
+librosa.display.waveplot(cthree,alpha=1)
+plt.title("Guitar #C3")
+plt.ylim((-1,1))
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+
+
+plt.subplot(3,1,2)
+librosa.display.waveplot(cfour,alpha=1)
+plt.title("Guitar #C4")
+plt.ylim((-1,1))
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+
+plt.subplot(3,1,3)
+librosa.display.waveplot(cfive,alpha=1)
+plt.title("Guitar #C5")
+plt.ylim((-1,1))
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+
+plt.show()
+
+# calculate amplitude envelop
+FRAME_SIZE = 1024 # chunks through the waveform
+HOP_LENGTH = 512 # steps to move through waveform
+
+def amplitude_envelop(signal, frame_size,hop_length):
+    amplitude_envelop = []
+    
+    #calculate amplitude envelop for each frame
+    for i in range(0, len(signal),hop_length):
+        current_frame_amplitude_envelop = max(signal[i:i+frame_size])
+        amplitude_envelop.append(current_frame_amplitude_envelop)
+        
+    return np.array(amplitude_envelop)
+    
+ampenv_cthree =amplitude_envelop(cthree, FRAME_SIZE, HOP_LENGTH)
+ampenv_cfour =amplitude_envelop(cfour, FRAME_SIZE, HOP_LENGTH)
+ampenv_cfive =amplitude_envelop(cfive, FRAME_SIZE, HOP_LENGTH)
+
+# visualize envelop and waveform for all files.
+
+plt.Figure(figsize=(50,100))
+frames = range(0, ampenv_cthree.size)
+t = librosa.frames_to_time(frames, hop_length=HOP_LENGTH)
+plt.subplot(3,1,1)
+librosa.display.waveplot(cthree,alpha=1)
+plt.plot(t,ampenv_cthree, "r")
+plt.title("Guitar #C3")
+plt.ylim((-1,1))
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+
+
+frames = range(0, ampenv_cfour.size)
+t = librosa.frames_to_time(frames, hop_length=HOP_LENGTH)
+plt.subplot(3,1,2)
+librosa.display.waveplot(cfour,alpha=1)
+plt.plot(t,ampenv_cfour, "r")
+plt.title("Guitar #C4")
+plt.ylim((-1,1))
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+
+frames = range(0, ampenv_cfive.size)
+t = librosa.frames_to_time(frames, hop_length=HOP_LENGTH)
+plt.subplot(3,1,3)
+librosa.display.waveplot(cfive,alpha=1)
+plt.plot(t,ampenv_cfive, "r")
+plt.title("Guitar #C5")
+plt.ylim((-1,1))
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+
+plt.show()
